@@ -110,7 +110,7 @@ class ImagePlayer:
                 ready_callback - callback just before anytthing is displayed
                 enable_menu  - there will be a child track so display the hint text
         """
-                        
+
         # instantiate arguments
         self.track=track
         self.showlist=showlist
@@ -192,6 +192,8 @@ class ImagePlayer:
         else:
             self.paused=False
 
+        #print "self.paused is "+str(self.paused)
+
     def stop(self):
         self.quit_signal=True
         
@@ -218,18 +220,24 @@ class ImagePlayer:
             if self.paused == False:
                 self.dwell_counter=self.dwell_counter+1
 
+            #print "self.paused is "+str(self.paused)
+            #if self.pause_text<>None:
+                #print "self.pause_text exists"
+
             # one time flipping of pause text
+            #NIK
             if self.paused==True and self.pause_text==None:
-                self.pause_text=self.canvas.create_text(100,100, anchor=NW,
+                self.pause_text=self.canvas.create_text(0,900, anchor=NW,
                                                       text=self.resource('imageplayer','m01'),
                                                       fill="white",
                                                       font="arial 25 bold")
                 self.canvas.update_idletasks( )
-                
+            #NIK
+
             if self.paused==False and self.pause_text<>None:
-                    self.canvas.delete(self.pause_text)
-                    self.pause_text=None
-                    self.canvas.update_idletasks( )
+                self.canvas.delete(self.pause_text)
+                self.pause_text=None
+                self.canvas.update_idletasks( )
 
             if self.dwell<>0 and self.dwell_counter==self.dwell:
                 self.end('normal','user quit or duration exceeded')
@@ -271,7 +279,7 @@ class ImagePlayer:
                    # clear events list for this track
                     if self.track_params['animate-clear']=='yes':
                         self.ppio.clear_events_list(id(self))
-                    
+
                     # create animation events for ending
                     reason,message=self.ppio.animate(self.animate_end_text,id(self))
                     if reason=='error':
@@ -280,7 +288,14 @@ class ImagePlayer:
                         self=None
                     else:
                         self.end_callback('normal',"track has terminated or quit")
+                        #NIK
+                        if self.pause_text<>None:
+                            self.canvas.delete(self.pause_text)
+                            self.pause_text=None
+                            self.canvas.update_idletasks( )
+                        #NIK
                         self=None
+
 
 
 # **********************************

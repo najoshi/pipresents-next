@@ -157,9 +157,21 @@ class MediaList:
             index +=1
         return count
 
-    def start(self):
-        # select first anymous track in the list
-        index=0
+    def start(self,sequence):
+        #NIK
+        random.shuffle(self._tracks)
+        f = open("/home/pi/tracks.out","w")
+        #f.write(self._tracks)
+        for i,d in enumerate(self._tracks):
+            f.write (d['location'] + "\n")
+        f.close()
+        #NIK
+        # select first anonymous track in the list
+        if sequence=='ordered':
+            index=0
+        else:
+            index=random.randint(0,self._num_tracks-1)
+
         while index<self._num_tracks:
             if self._tracks[index] ['track-ref'] =="":
                 self.select(index)
@@ -168,7 +180,7 @@ class MediaList:
         return False
 
     def finish(self):
-        # select last anymous track in the list
+        # select last anonymous track in the list
         index=self._num_tracks-1
         while index>=0:
             if self._tracks[index] ['track-ref'] =="":

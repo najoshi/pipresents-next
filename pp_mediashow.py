@@ -5,6 +5,7 @@ import PIL.Image
 import PIL.ImageTk
 import PIL.ImageEnhance
 import time
+import subprocess
 
 from pp_imageplayer import ImagePlayer
 from pp_videoplayer import VideoPlayer
@@ -73,6 +74,9 @@ class MediaShow:
 
         #create and instance of TimeOfDay scheduler so we can add events
         self.tod=TimeOfDay()
+
+        #NIK
+        self.paused = False
 
         self.state='closed'
 
@@ -197,6 +201,7 @@ class MediaShow:
 
     #service the standard inputs for this show
     def do_operation(self,operation,edge,source):
+        self.mon.log(self, "Operation: "+operation)
         if self.shower<>None:
             # if next lower show is running pass down to stop the show and lower level
             self.shower.input_pressed(operation,edge,source) 
@@ -236,6 +241,13 @@ class MediaShow:
                         self.start_show()
 
             elif operation == 'pause':
+                #NIK
+                if self.paused:
+                    self.paused = False
+                else:
+                    self.paused = True
+                #NIK
+
                 if self.player<>None:
                     self.player.input_pressed(operation)
                     
@@ -362,7 +374,7 @@ class MediaShow:
         if self.command=='backward':
             self.medialist.finish()
         else:
-            self.medialist.start()
+            self.medialist.start(self.show_params['sequence'])
         self.play_selected_track(self.medialist.selected_track())
  
  
@@ -427,6 +439,11 @@ class MediaShow:
             else:
                 self.medialist.next(self.show_params['sequence'])
                 self.play_selected_track(self.medialist.selected_track())
+
+            #NIK
+            if self.paused:
+                self.player.input_pressed('pause')
+            #NIK
                 
         # skip to previous track on user input
         elif self.previous_track_signal==True:
@@ -443,6 +460,11 @@ class MediaShow:
             else:
                 self.medialist.previous(self.show_params['sequence'])              
                 self.play_selected_track(self.medialist.selected_track())
+
+            #NIK
+            if self.paused:
+                self.player.input_pressed('pause')
+            #NIK
         
 
         # track is finished and we are on auto        
@@ -537,6 +559,10 @@ class MediaShow:
         track_type = selected_track['type']
         self.mon.log(self,self.show_params['show-ref']+ ' '+ str(self.show_id)+ ": Track type is: "+ track_type)
         if track_type=="video":
+            # NIK
+            subprocess.call("killall omxplayer.bin", shell=True)
+            # NIK
+
             # create a videoplayer
             track_file=self.complete_path(selected_track)
             self.player=VideoPlayer(self.show_id,self.root,self.canvas,self.show_params,selected_track,self.pp_dir,self.pp_home,self.pp_profile)

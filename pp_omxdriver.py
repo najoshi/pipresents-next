@@ -56,6 +56,8 @@ class OMXDriver(object):
         self.mon.on()
         
         self.paused=None
+        #NIK
+        self.delayed_pause = False
 
         self._process=None
 
@@ -63,6 +65,7 @@ class OMXDriver(object):
         self._process.send(char)
 
     def pause(self):
+        #print "sending p"
         self._process.send('p')       
         if not self.paused:
             self.paused = True
@@ -120,13 +123,13 @@ class OMXDriver(object):
         self._process = pexpect.spawn(cmd)
 
         # uncomment to monitor output to and input from omxplayer.bin (read pexpect manual)
-        fout= file('omxlogfile.txt','w')  #uncomment and change sys.stdout to fout to log to a file
+        # fout= file('omxlogfile.txt','w')  #uncomment and change sys.stdout to fout to log to a file
         # self._process.logfile_send = sys.stdout  # send just commands to stdout
-        self._process.logfile=fout  # send all communications to log file
+        # self._process.logfile=fout  # send all communications to log file
 
-        if pause_before_play:
-            self._process.send('p')
-            self.paused = True
+        #if pause_before_play:
+            #self._process.send('p')
+            #self.paused = True
             
         #start the thread that is going to monitor sys.stdout. Presumably needs a thread because of blocking
         self._position_thread = Thread(target=self._get_position)
@@ -134,6 +137,7 @@ class OMXDriver(object):
 
     def _get_position(self):
         self.start_play_signal = True  
+        self.first = True
 
         self.video_position=0.0
         self.audio_position=0.0
@@ -171,7 +175,16 @@ class OMXDriver(object):
             else:
                 #  - 3 matches _STATUS_REXP so get time stamp
                 self.video_position = float(self._process.match.group(1))
-                self.audio_position = 0.0             
+                self.audio_position = 0.0
+
+                #NIK
+                if self.delayed_pause and self.first and self.video_position > 1:
+                    #print "sending pause, video position: "+str(self.video_position)
+                    self.first = False
+                    self._process.send('p')
+                    self.paused = True
+                #NIK
+
             #sleep is Ok here as it is a seperate thread. self.widget.after has funny effects as its not in the maion thread.
             sleep(0.05)   # stats output rate seem to be about 170mS.
 

@@ -211,6 +211,11 @@ class VideoPlayer:
         if self.play_state in (VideoPlayer._PLAYING,VideoPlayer._ENDING):
             self.omx.pause()
             return True
+        #NIK
+        elif self.play_state == VideoPlayer._STARTING:
+            self.omx.delayed_pause = True
+            return True
+        #NIK
         else:
             self.mon.log(self,"!<pause rejected")
             return False
@@ -251,6 +256,15 @@ class VideoPlayer:
         
         #play the selected track
         options=self.omx_audio+ " " + self.omx_volume + ' ' + self.omx_window + ' ' + self.show_params['omx-other-options']+" "
+        # NIK ADDITION
+        if 'omx-subtitles' in self.track_params and self.track_params['omx-subtitles'] <> '':
+            subtitles_full_path = self.complete_path(self.track_params['omx-subtitles'])
+            if os.path.exists (subtitles_full_path):
+                options += '--font-size 40 --subtitles "' + subtitles_full_path + '" '
+
+        if 'omx-subtitles-numlines' in self.track_params and self.track_params['omx-subtitles-numlines'] <> '':
+            options += '--lines ' + self.track_params['omx-subtitles-numlines'] + ' '
+        # END NIK ADDITION
         self.omx.play(track,options)
         self.mon.log (self,'Playing track from show Id: '+ str(self.show_id))
         # and start polling for state changes
@@ -271,6 +285,7 @@ class VideoPlayer:
                 self.omx.start_play_signal=False
                 self.play_state=VideoPlayer._PLAYING
                 self.mon.log(self,"      State machine: omx_playing started")
+
             self.tick_timer=self.canvas.after(50, self.play_state_machine)
 
         elif self.play_state == VideoPlayer._PLAYING:

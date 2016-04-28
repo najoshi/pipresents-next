@@ -5,6 +5,7 @@ from Tkinter import *
 import Tkinter as tk
 import os
 import ConfigParser
+import subprocess
 from pp_utils import Monitor
 from pp_options import command_options
 
@@ -67,6 +68,9 @@ class PPIO:
     options=None
     # gpio_enabled=False
 
+    #NIK
+    SHUTOFF_DELAY = 120
+
     
     EVENT_TEMPLATE=[0,False,0,None]
 
@@ -86,6 +90,11 @@ class PPIO:
         self.pp_home=pp_home
         self.button_tick=button_tick
         self.callback=callback
+
+        # NIK
+        self.turned_off = False
+        self.last_motion_time = time.time()
+        self.paused = False
 
         PPIO.SHUTDOWN_INDEX=0
 
@@ -147,7 +156,16 @@ class PPIO:
             num = pin[PPIO.PIN]
             if pin[PPIO.DIRECTION]=='in':
                 self.GPIO.setup(num,self.GPIO.IN,pull_up_down=pin[PPIO.PULL])
-            elif  pin[PPIO.DIRECTION]=='out':
+
+                #NIK
+                if pin[PPIO.RISING_NAME] == 'pir-switch-on':
+                    if self.GPIO.input(num):
+                        self.pir_switch_on = True
+                    else:
+                        self.pir_switch_on = False
+                #NIK
+
+            elif pin[PPIO.DIRECTION]=='out':
                 self.GPIO.setup(num,self.GPIO.OUT)
                 self.GPIO.setup(num,False)
         self.reset_inputs()
@@ -203,7 +221,25 @@ class PPIO:
         else:
             return False
 
+    #NIK
+    def turn_on(self):
+        subprocess.call("vcgencmd display_power 1", shell=True)
+
+    def turn_off(self):
+        subprocess.call("vcgencmd display_power 0", shell=True)
+    #NIK
+
     def do_buttons(self):
+        # NIK
+        if self.pir_switch_on and not self.turned_off and not self.paused and time.time() > (self.last_motion_time + PPIO.SHUTOFF_DELAY):
+            # self.mon.log(self,"PIR not motion. self.pir_switch_on: "+str(self.pir_switch_on)+", self.turned_off: "+str(self.turned_off)+", self.paused: "+str(self.paused))
+            # os.system ("echo `date` PIR not motion. self.pir_switch_on: "+str(self.pir_switch_on)+", self.turned_off: "+str(self.turned_off)+", self.paused: "+str(self.paused)+" >> /home/pi/pir.log")
+            self.turned_off = True
+            # turn off monitor and pause pi presents
+            self.turn_off()
+            self.callback(1,"pp-pause","rising")
+        #NIK
+
         for index, pin in enumerate(PPIO.pins):
             if pin[PPIO.DIRECTION]=='in':
                 # debounce
@@ -211,33 +247,96 @@ class PPIO:
                     if pin[PPIO.COUNT]<pin[PPIO.THRESHOLD]:
                         pin[PPIO.COUNT]+=1
                         if pin[PPIO.COUNT]==pin[PPIO.THRESHOLD]:
+                            # if pin[PPIO.RISING_NAME]=='PIR':
+                                # os.system ("echo `date` debounce 1. PPIO.COUNT: "+str(pin[PPIO.COUNT])+" >> /home/pi/pir.log")
                             pin[PPIO.PRESSED]=True
-                else: # input us 1
+                else: # input is 1
                     if pin[PPIO.COUNT]>0:
                         pin[PPIO.COUNT]-=1
                         if pin[PPIO.COUNT]==0:
-                             pin[PPIO.PRESSED]=False
+                            # if pin[PPIO.RISING_NAME]=='PIR':
+                                # os.system ("echo `date` debounce 2. PPIO.COUNT: "+str(pin[PPIO.COUNT])+" >> /home/pi/pir.log")
+                            pin[PPIO.PRESSED]=False
      
                 #detect edges
                 # falling edge
                 if pin[PPIO.PRESSED]==True and pin[PPIO.LAST]==False:
                     pin[PPIO.LAST]=pin[PPIO.PRESSED]
                     pin[PPIO.REPEAT_COUNT]=pin[PPIO.REPEAT]
-                    if  pin[PPIO.FALLING_NAME]<>'' and self.callback <> None:
+                    self.mon.log(self,"Falling edge: " + pin[PPIO.FALLING_NAME])
+
+                    # NIK
+                    if pin[PPIO.FALLING_NAME]=='pir-switch-off' and self.callback <> None:
+                        if self.pir_switch_on:
+                            self.pir_switch_on = False
+                            if self.turned_off:
+                                self.turned_off = False
+                                self.turn_on()
+                                self.callback(index,"pp-pause","rising")
+
+                    elif pin[PPIO.FALLING_NAME]=='pp-pause' and self.callback <> None:
+                        # if monitor is off, then show is paused by program (not user)
+                        # so pressing pause just turns monitor back on
+                        if self.turned_off:
+                            self.turn_on()
+                            self.turned_off = False
+                            self.paused = True
+
+                        else:
+                            if self.paused:
+                                self.paused = False
+                                self.last_motion_time = time.time()
+                            else:
+                                self.paused = True
+                            self.callback(index,"pp-pause","rising")
+
+                    elif pin[PPIO.FALLING_NAME] in ('pp-up','pp-down') and self.callback <> None:
+                        if self.turned_off:
+                            self.turned_off = False
+                            self.turn_on()
+                            self.callback(index,"pp-pause","rising")
                         self.callback(index, pin[PPIO.FALLING_NAME],"falling")
+                    #NIK
+
+                    else:
+                        if pin[PPIO.FALLING_NAME]<>'' and self.callback <> None:
+                            self.callback(index, pin[PPIO.FALLING_NAME],"falling")
+
                #rising edge
                 if pin[PPIO.PRESSED]==False and pin[PPIO.LAST]==True:
                     pin[PPIO.LAST]=pin[PPIO.PRESSED]
                     pin[PPIO.REPEAT_COUNT]=pin[PPIO.REPEAT]
-                    if  pin[PPIO.RISING_NAME]<>'' and self.callback <> None:
-                         self.callback(index, pin[PPIO.RISING_NAME],"rising")
+                    self.mon.log(self,"Rising edge: " + pin[PPIO.RISING_NAME])
+
+                    # NIK
+                    if pin[PPIO.RISING_NAME]=='PIR' and self.callback <> None:
+                        if self.pir_switch_on:
+                            # os.system ("echo `date` PIR motion 1. self.pir_switch_on: "+str(self.pir_switch_on)+", self.turned_off: "+str(self.turned_off)+", self.paused: "+str(self.paused)+", repeat count: "+str(pin[PPIO.REPEAT_COUNT])+" >> /home/pi/pir.log")
+                            self.last_motion_time = time.time()
+                            if self.turned_off:
+                                # self.mon.log(self,"PIR motion. self.pir_switch_on: "+str(self.pir_switch_on)+", self.turned_off: "+str(self.turned_off)+", self.paused: "+str(self.paused))
+                                # os.system ("echo `date` PIR motion 2. self.pir_switch_on: "+str(self.pir_switch_on)+", self.turned_off: "+str(self.turned_off)+", self.paused: "+str(self.paused)+", repeat count: "+str(pin[PPIO.REPEAT_COUNT])+" >> /home/pi/pir.log")
+                                self.turned_off = False
+                                # turn on monitor and unpause pi presents
+                                self.turn_on()
+                                self.callback(index,"pp-pause","rising")
+
+                    elif pin[PPIO.RISING_NAME]=='pir-switch-on' and self.callback <> None:
+                        if not self.pir_switch_on:
+                            self.last_motion_time = time.time()
+                            self.pir_switch_on = True
+                    else:
+                        if pin[PPIO.RISING_NAME]<>'' and self.callback <> None:
+                            self.callback(index, pin[PPIO.RISING_NAME],"rising")
 
                 # do state callbacks
                 if pin[PPIO.REPEAT_COUNT]==0:
                     if pin[PPIO.ZERO_NAME]<>'' and pin[PPIO.PRESSED]==True and self.callback<>None:
                         self.callback(index, pin[PPIO.ZERO_NAME],"zero")
+
                     if pin[PPIO.ONE_NAME]<>'' and pin[PPIO.PRESSED]==False and self.callback<>None:
                         self.callback(index, pin[PPIO.ONE_NAME],"zero")
+
                     pin[PPIO.REPEAT_COUNT]=pin[PPIO.REPEAT]
                 else:
                     if pin[PPIO.REPEAT]<>-1:
@@ -456,7 +555,7 @@ if __name__ == '__main__':
 
     pevent=None
     
-    pp_dir='/home/pi/pipresents'
+    pp_dir='/home/pi/pipresents-next'
     pp_profile='/home/pi/pp_home/pp_profiles/trigger_test'
     Monitor.log_path=pp_dir
     Monitor.global_enable=True
