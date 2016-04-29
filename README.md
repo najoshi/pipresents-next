@@ -1,6 +1,19 @@
 A Modification of Pi Presents to use in a digital photo frame
 =============================================================
 
+I wanted to make a digital photo frame that:
+
+* Would show both pictures and video with sound
+* Would have high storage capacity
+* Would shuffle the pictures/videos so they weren't in order
+* Would have buttons to pause and go forwards/backwards through the slideshow
+* Would have the capability of annotating the pictures and video with text
+* Would have a motion sensor
+* Would be large in size, i.e. a large monitor
+* Would all fit in one package to mount on the wall, i.e. storage, the Pi, buttons, the monitor, etc.
+* Would be able to handle tens of thousands of pictures and video
+
+
 Instructions coming soon...
 
 
