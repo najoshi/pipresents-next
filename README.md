@@ -1,7 +1,7 @@
 A Modification of Pi Presents to use in a digital photo frame
 =============================================================
 
-Instructions coming soon....
+Instructions coming soon...
 
 
 
