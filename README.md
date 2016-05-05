@@ -12,9 +12,10 @@ I wanted to make a digital photo frame that:
 * Would be large in size, i.e. a large monitor
 * Would all fit in one package to mount on the wall, i.e. storage, the Pi, buttons, the monitor, etc.
 * Would be able to handle tens of thousands of pictures and video
+* Would not need soldering
 
 
-Instructions coming soon...
+For instructions, go <a href="http://najoshi.github.io/pipresents-next-digital-photo-frame/">here.</a>
 
 
 
