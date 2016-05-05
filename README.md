@@ -15,7 +15,7 @@ I wanted to make a digital photo frame that:
 * Would not need soldering
 
 
-For instructions, go <a href="http://najoshi.github.io/pipresents-next-digital-photo-frame/">here.</a>
+For instructions and demo, go <a href="http://najoshi.github.io/pipresents-next-digital-photo-frame/">here.</a>
 
 
 
