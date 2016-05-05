@@ -159,6 +159,7 @@ class MediaList:
 
     def start(self,sequence):
         #NIK
+        # shuffle tracks and write track list to file
         random.shuffle(self._tracks)
         f = open("/home/pi/tracks.out","w")
         #f.write(self._tracks)

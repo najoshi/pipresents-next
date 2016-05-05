@@ -77,6 +77,7 @@ class MediaShow:
 
         #NIK
         self.paused = False
+        #pause state
 
         self.state='closed'
 
@@ -560,6 +561,7 @@ class MediaShow:
         self.mon.log(self,self.show_params['show-ref']+ ' '+ str(self.show_id)+ ": Track type is: "+ track_type)
         if track_type=="video":
             # NIK
+            # bug fix hack where multiple omxplayers were running at the same time, causing display problems
             subprocess.call("killall omxplayer.bin", shell=True)
             # NIK
 

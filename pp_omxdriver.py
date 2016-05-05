@@ -57,7 +57,9 @@ class OMXDriver(object):
         
         self.paused=None
         #NIK
+        # for pausing video while moving back and forth through slideshow
         self.delayed_pause = False
+        #NIK
 
         self._process=None
 
@@ -178,6 +180,7 @@ class OMXDriver(object):
                 self.audio_position = 0.0
 
                 #NIK
+                # pausing video after first frame
                 if self.delayed_pause and self.first and self.video_position > 1:
                     #print "sending pause, video position: "+str(self.video_position)
                     self.first = False

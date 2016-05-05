@@ -212,6 +212,7 @@ class VideoPlayer:
             self.omx.pause()
             return True
         #NIK
+        # for pausing video after first frame
         elif self.play_state == VideoPlayer._STARTING:
             self.omx.delayed_pause = True
             return True
@@ -257,6 +258,7 @@ class VideoPlayer:
         #play the selected track
         options=self.omx_audio+ " " + self.omx_volume + ' ' + self.omx_window + ' ' + self.show_params['omx-other-options']+" "
         # NIK ADDITION
+        # adding subtitles file for video
         if 'omx-subtitles' in self.track_params and self.track_params['omx-subtitles'] <> '':
             subtitles_full_path = self.complete_path(self.track_params['omx-subtitles'])
             if os.path.exists (subtitles_full_path):

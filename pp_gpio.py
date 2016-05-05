@@ -70,6 +70,8 @@ class PPIO:
 
     #NIK
     SHUTOFF_DELAY = 120
+    # motion sensor timeout, i.e. after SHUTOFF_DELAY seconds of no motion
+    # pipresents pauses and the monitor turns off
 
     
     EVENT_TEMPLATE=[0,False,0,None]
@@ -95,6 +97,7 @@ class PPIO:
         self.turned_off = False
         self.last_motion_time = time.time()
         self.paused = False
+        # initializing variables
 
         PPIO.SHUTDOWN_INDEX=0
 
@@ -222,6 +225,7 @@ class PPIO:
             return False
 
     #NIK
+    # turn on and off monitor
     def turn_on(self):
         subprocess.call("vcgencmd display_power 1", shell=True)
 
@@ -231,6 +235,7 @@ class PPIO:
 
     def do_buttons(self):
         # NIK
+        # If motion hasn't been detectedin SHUTOFF_DELAY seconds, turn off monitor and pause
         if self.pir_switch_on and not self.turned_off and not self.paused and time.time() > (self.last_motion_time + PPIO.SHUTOFF_DELAY):
             # self.mon.log(self,"PIR not motion. self.pir_switch_on: "+str(self.pir_switch_on)+", self.turned_off: "+str(self.turned_off)+", self.paused: "+str(self.paused))
             # os.system ("echo `date` PIR not motion. self.pir_switch_on: "+str(self.pir_switch_on)+", self.turned_off: "+str(self.turned_off)+", self.paused: "+str(self.paused)+" >> /home/pi/pir.log")
@@ -266,6 +271,7 @@ class PPIO:
                     self.mon.log(self,"Falling edge: " + pin[PPIO.FALLING_NAME])
 
                     # NIK
+                    # when motion is detected, unpause pipresents and turn on monitor
                     if pin[PPIO.FALLING_NAME]=='pir-switch-off' and self.callback <> None:
                         if self.pir_switch_on:
                             self.pir_switch_on = False
@@ -309,6 +315,8 @@ class PPIO:
                     self.mon.log(self,"Rising edge: " + pin[PPIO.RISING_NAME])
 
                     # NIK
+                    # If motion is detected and pipresents is not paused, then simply update the last motion time
+                    # If motion is detected and pipresents is paused, then unpause and turn on monitor
                     if pin[PPIO.RISING_NAME]=='PIR' and self.callback <> None:
                         if self.pir_switch_on:
                             # os.system ("echo `date` PIR motion 1. self.pir_switch_on: "+str(self.pir_switch_on)+", self.turned_off: "+str(self.turned_off)+", self.paused: "+str(self.paused)+", repeat count: "+str(pin[PPIO.REPEAT_COUNT])+" >> /home/pi/pir.log")
