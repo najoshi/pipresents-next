@@ -142,6 +142,10 @@ Using female-to-female wires, connect the PIR sensor pins to pins 2, 11, and 6 o
 <img src="media/IMG_0394_arrow1.resized.JPG" vspace=20>
 <img src="media/gpio-pins-pi2-arrow2.resized.jpg" vspace=20>
 
+Now, let's test the PIR sensor. You may want to mount the monitor where it is supposed to go, or at least be able to place it there temporarily. You may also want to enable ssh login into the Pi so you don't need a keyboard and mouse connected directly to it. In the digital photo frame repo, there is a "scripts" directory. In that directory, there is a script named "pir.py". Run that script on the command-line on the Pi using sudo (i.e. "sudo pir.py"). This script just runs in a loop and polls the PIR to see if there is signal (i.e. movement). After 30 seconds of no movement, it will put the monitor on standby. Then when there is movement, it will turn the monitor on again. Use this to test the motion sensor and its placement on the monitor. There are also two analog dials on the PIR itself that control the delay of the signal firing (labelled "time") and the sensitivity of the sensor (labelled "sensitive"). You'll want to put the delay at minimum and then play with the sensitivity to get the right distance at which you want motion to trigger the sensor. Finally, when you have figured out the best placement and settings for the PIR, use your hot glue gun on the rubber-coated wire supports to glue it into place.
+
+
+<h2><u>Step 9</u></h2>
 
 <!--
 <img src="media/IMG_0392.resized.JPG">
