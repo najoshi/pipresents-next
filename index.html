@@ -162,20 +162,20 @@ Now, let's test pipresents with our enhancements. First, make sure you go to the
 
 <h2><u>Step 11</u></h2>
 
-Now, we will make the whole thing production ready. We need to make it so that pipresents starts up automatically and takes up the entire screen, and we need to make some other adjustments for a smooth operation. First, let's change the /boot/config.txt file. Uncomment and add/change these lines:
+Now, we will make the whole thing production ready. We need to make it so that pipresents starts up automatically and takes up the entire screen, and we need to make some other adjustments for a smooth operation. First, let's change the /boot/config.txt file. Uncomment and add/change these lines:<br/>
 
 <code>
-disable_overscan=1
-framebuffer_width=1920
-framebuffer_height=1080
-max_usb_current=1
-gpu_mem=128
+disable_overscan=1<br/>
+framebuffer_width=1920<br/>
+framebuffer_height=1080<br/>
+max_usb_current=1<br/>
+gpu_mem=128<br/>
 </code>
 
-You will need to reboot the Pi for the changes to take effect. Next, follow the directions in the manual in section 5.4.7.2 to make pipresents work full screen. Then follow the directions in section 9.6 to start pipresents automatically. Make sure to use the command (or something similar):
+You will need to reboot the Pi for the changes to take effect. Next, follow the directions in the manual in section 5.4.7.2 to make pipresents work full screen. Then follow the directions in section 9.6 to start pipresents automatically. Make sure to use the command (or something similar):<br/>
 
 <code>
-sudo python /home/pi/pipresents-next-digital-photo-frame/pipresents.py --gpio -f -b -o /home/pi/pipresents-next-digital-photo-frame -p digital_media_frame
+sudo python /home/pi/pipresents-next-digital-photo-frame/pipresents.py --gpio -f -b -o /home/pi/pipresents-next-digital-photo-frame -p digital_media_frame<br/>
 </code>
 
 
