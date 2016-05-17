@@ -166,19 +166,21 @@ Now, we will make the whole thing production ready. We need to make it so that p
 
 <pre>
 <code>
-disable_overscan=1<br/>
-framebuffer_width=1920<br/>
-framebuffer_height=1080<br/>
-max_usb_current=1<br/>
-gpu_mem=128<br/>
+disable_overscan=1
+framebuffer_width=1920
+framebuffer_height=1080
+max_usb_current=1
+gpu_mem=128
 </code>
 </pre> 
 
 You will need to reboot the Pi for the changes to take effect. Next, follow the directions in the manual in section 5.4.7.2 to make pipresents work full screen. Then follow the directions in section 9.6 to start pipresents automatically. Make sure to use the command (or something similar):<br/>
 
+<pre>
 <code>
-sudo python /home/pi/pipresents-next-digital-photo-frame/pipresents.py --gpio -f -b -o /home/pi/pipresents-next-digital-photo-frame -p digital_media_frame<br/>
+sudo python /home/pi/pipresents-next-digital-photo-frame/pipresents.py --gpio -f -b -o /home/pi/pipresents-next-digital-photo-frame -p digital_media_frame
 </code>
+</pre>
 
 
 <!--
