@@ -155,6 +155,30 @@ In this step, we will add an off switch, tape up the Pi, and add the hard drive.
 Finally, as shown above, tape up the wires into the Pi so that the hole is covered and the wires are secure. Use hot glue to glue the switch to the monitor. Use velcro to attach the hard drive to the monitor and then connect it to the Pi. Finally, you might need to use some velcro/hot glue combination to keep the HDMI cable from dangling below the monitor.
 
 
+<h2><u>Step 10</u></h2>
+
+Now, let's test pipresents with our enhancements. First, make sure you go to the <a href="https://github.com/KenT2/pipresents-next">README</a> on the pipresents page and follow the instructions on installing required applications and installing pexpect. You should read the manual (which is in the repo) and use the profile editor to create a new profile and a new mediashow, but remember to do it in the "pipresents-next-digital-photo-frame" directory. I called mine "digital_media_frame". Keep in mind that pipresents-next cannot handle photo files much larger than 1Mb and does not use the EXIF data in a photo file. So any photos you put into the mediashow will need to be rotated according to the EXIF data and then resized to fit in the monitor. I use "jhead -autorot" and "convert -resize 1920x1080" to do this. You should also put a video in the mediashow to test it out. Remember to run it using "sudo" and with the "--gpio" option. Later, you will use scripts and programs I have written to create the json file for the media show, but for now, test it using the editor. Make sure to test all the buttons and the PIR motion sensor.
+
+
+<h2><u>Step 11</u></h2>
+
+Now, we will make the whole thing production ready. We need to make it so that pipresents starts up automatically and takes up the entire screen, and we need to make some other adjustments for a smooth operation. First, let's change the /boot/config.txt file. Uncomment and add/change these lines:
+
+<code>
+disable_overscan=1
+framebuffer_width=1920
+framebuffer_height=1080
+max_usb_current=1
+gpu_mem=128
+</code>
+
+You will need to reboot the Pi for the changes to take effect. Next, follow the directions in the manual in section 5.4.7.2 to make pipresents work full screen. Then follow the directions in section 9.6 to start pipresents automatically. Make sure to use the command (or something similar):
+
+<code>
+sudo python /home/pi/pipresents-next-digital-photo-frame/pipresents.py --gpio -f -b -o /home/pi/pipresents-next-digital-photo-frame -p digital_media_frame
+</code>
+
+
 <!--
 <img src="media/IMG_0392.resized.JPG">
 <img src="media/IMG_0393.resized.JPG">
