@@ -171,11 +171,23 @@ max_usb_current=1
 gpu_mem=128
 </code></pre>
 
-You will need to reboot the Pi for the changes to take effect. Next, follow the directions in the manual in section 5.4.7.2 to make pipresents work full screen. Then follow the directions in section 9.6 to start pipresents automatically. Make sure to use the command (or something similar):
+You will need to reboot the Pi for the changes to take effect. Next, follow the directions in the manual in section 5.4.7.2 to make pipresents work full screen. Then follow the directions in section 9.6 to start pipresents automatically. Instead of putting the pipresents line directly in the autostart file, you should create another file called "start_pipresents.sh" in that directory and put these lines in that file:
 <pre><code>
+#!/bin/bash
+
+sleep 10
 sudo python /home/pi/pipresents-next-digital-photo-frame/pipresents.py --gpio -f -b -o /home/pi/pipresents-next-digital-photo-frame -p digital_media_frame
 </code></pre>
 
+Then put a call to "start_pipresents.sh" in autostart. This is for our external hard drive... it needs a few extra seconds to get mounted so we sleep 10 seconds before starting pipresents. Now, we will transition all of the profile data to the external drive. What you need to do is find out where your external hard drive is being mounted to and make your media directory a link to a media directory on the hard drive. So, for example, I created a directory called "media" on my external drive and then inside the pipresents-next-digital-photo-frame/pp_home directory I have a link to "/media/Seagate Expansion Drive/media/". This is where all of the pictures and video will go. Then I put my media.json file in the media direcotry and in the pipresents-next/pp_home/pp_profiles/digital_media_frame directory, I create a link to "/media/Seagate Expansion Drive/media/media.json". Also, in the pp_showlist.json file, you may want to change the "duration" setting to however many seconds you want each picture to be shown on the screen.<br/>
+
+Finally, if you added the off switch to your frame, edit /etc/rc.local (using sudo), and put a call to the sd_check.py script located in the scripts directory. So it would look something like this:
+<pre><code>
+sudo /home/pi/pipresents-next-digital-photo-frame/scripts/sd_check.py &
+exit 0
+</code></pre>
+
+You'll need to reboot for the changes to take effect.
 
 <!--
 <img src="media/IMG_0392.resized.JPG">
