@@ -44,9 +44,13 @@ sub process_jpg {
 	$newfile =~ s/\.(jpe{0,1}g)$/.resized.$1/i;
 
 	#system ("exifautotran \"$thefile\"");
-	system ("jhead -autorot \"$thefile\"");
-	system ("convert -resize $GEOM \"$thefile\" \"$thefile\"");
-	system ("mv \"$thefile\" \"$newfile\"");
+	#system ("jhead -autorot \"$thefile\"");
+	system ("convert -resize $GEOM -auto-orient \"$thefile\" \"$newfile\"");
+	if (-s $newfile > 1100000) {
+		system ("convert -resize $GEOM -quality 90 -auto-orient \"$thefile\" \"$newfile\"");
+	}
+	#system ("mv \"$thefile\" \"$newfile\"");
+	system ("rm \"$thefile\"");
 }
 
 sub process_png {
@@ -65,9 +69,13 @@ sub process_png {
         $newfile =~ s/\.(png)$/.resized.$1/i;
 
         #system ("exifautotran \"$thefile\"");
-	system ("jhead -autorot \"$thefile\"");
-        system ("convert -resize $GEOM \"$thefile\" \"$thefile\"");
-        system ("mv \"$thefile\" \"$newfile\"");
+	#system ("jhead -autorot \"$thefile\"");
+        system ("convert -resize $GEOM -auto-orient \"$thefile\" \"$newfile\"");
+	if (-s $newfile > 1100000) {
+		system ("convert -resize $GEOM -quality 90 -auto-orient \"$thefile\" \"$newfile\"");
+	}
+        #system ("mv \"$thefile\" \"$newfile\"");
+	system ("rm \"$thefile\"");
 }
 
 
