@@ -4,9 +4,7 @@ use Tk;
 
 sub do_copy {
 
-my @dirs = split("\n", $ENV{NAUTILUS_SCRIPT_SELECTED_FILE_PATHS});
-
-foreach $dir (@dirs) {
+foreach $dir (@ARGV) {
 
 if ($dir =~ /^(.+)\/$/) {$dir = $1;}
 ($basedir) = $dir =~ /^.+\/(.+)$/;

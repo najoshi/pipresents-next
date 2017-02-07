@@ -2,21 +2,20 @@
 use Tk;
 use strict;
 
-my @files = split("\n", $ENV{NAUTILUS_SCRIPT_SELECTED_FILE_PATHS});
 my $file_str = "";
 
-foreach my $file (@files) {
+foreach my $file (@ARGV) {
 	$file_str .= "\"$file\" ";
 }
 
 my $du_out;
-if (scalar(@files) == 1) {
+if (scalar(@ARGV) == 1) {
 	$du_out = `du -sh $file_str`;
 	chomp $du_out;
 } else {
 	$du_out = `du -shc $file_str | tail -1`;
 	chomp $du_out;
-	$du_out = scalar(@files) . " items selected\n" . $du_out;
+	$du_out = scalar(@ARGV) . " items selected\n" . $du_out;
 }
 
 my $num_files = `find $file_str -type f | wc -l`;
@@ -26,7 +25,7 @@ my $text_label;
 if ($num_files == 1) {$text_label = "$num_files file\n$du_out";}
 else {$text_label = "$num_files files\n$du_out";}
 
-my $mw = MainWindow->new(title => 'Size');
+my $mw = MainWindow->new(title => 'Disk Usage');
 $mw->optionAdd('*font', 'Helvetica 20');
 
 $mw->Label(-text => $text_label)->pack (-expand => 1, -fill => 'both');

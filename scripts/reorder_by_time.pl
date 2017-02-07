@@ -8,9 +8,7 @@ use File::Copy;
 my %times;
 
 sub do_reorder {
-	my @dirs = split("\n", $ENV{NAUTILUS_SCRIPT_SELECTED_FILE_PATHS});
-
-	foreach $dir (@dirs) {
+	foreach $dir (@ARGV) {
 
 		$filenum=1;
 

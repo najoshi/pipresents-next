@@ -45,9 +45,9 @@ sub process_jpg {
 
 	#system ("exifautotran \"$thefile\"");
 	#system ("jhead -autorot \"$thefile\"");
-	system ("convert -resize $GEOM -auto-orient \"$thefile\" \"$newfile\"");
+	system ("convert -auto-orient -resize $GEOM \"$thefile\" \"$newfile\"");
 	if (-s $newfile > 1100000) {
-		system ("convert -resize $GEOM -quality 90 -auto-orient \"$thefile\" \"$newfile\"");
+		system ("convert -auto-orient -resize $GEOM -quality 90 \"$thefile\" \"$newfile\"");
 	}
 	#system ("mv \"$thefile\" \"$newfile\"");
 	system ("rm \"$thefile\"");
@@ -70,9 +70,9 @@ sub process_png {
 
         #system ("exifautotran \"$thefile\"");
 	#system ("jhead -autorot \"$thefile\"");
-        system ("convert -resize $GEOM -auto-orient \"$thefile\" \"$newfile\"");
+        system ("convert -auto-orient -resize $GEOM \"$thefile\" \"$newfile\"");
 	if (-s $newfile > 1100000) {
-		system ("convert -resize $GEOM -quality 90 -auto-orient \"$thefile\" \"$newfile\"");
+		system ("convert -auto-orient -resize $GEOM -quality 90 \"$thefile\" \"$newfile\"");
 	}
         #system ("mv \"$thefile\" \"$newfile\"");
 	system ("rm \"$thefile\"");
@@ -100,13 +100,23 @@ sub process_video {
 
 	my $rot = `mediainfo --Inform="Video;%Rotation%" "$thefile"`;
 	chomp $rot;
+	my $width = `mediainfo --Inform="Video;%Width%" "$thefile"`;
+	my $height = `mediainfo --Inform="Video;%Height%" "$thefile"`;
+	chomp $width;
+	chomp $height;
 
-	if ($rot == 180 || $rot == 90) {
+	if ($rot != 0 || ($width>1920 && $height>1080)) {
 		my $newvid = $thefile;
 		$newvid =~ s/$ext$/rotated.$ext/;
-		print STDERR "Rotating $rot degrees...\n";
-		if ($rot == 180) {system ("avconv -i \"$thefile\" -vf \"transpose=1,transpose=1\" \"$newvid\"");}
-		elsif ($rot == 90) {system ("avconv -i \"$thefile\" -vf \"transpose=1\" \"$newvid\"");}
+		print STDERR "Rotating $rot degrees (or resizing)...\n";
+
+		$resize="";
+		if ($width > 1920 && $height > 1080) {$resize = "-vf scale=1920:-1";}
+
+		# ffmpeg 3.0 will autorotate video
+		#if ($rot == 180) {system ("avconv -i \"$thefile\" -vf \"transpose=1,transpose=1\" \"$newvid\"");}
+		#elsif ($rot == 90) {system ("avconv -i \"$thefile\" -vf \"transpose=1\" \"$newvid\"");}
+		system ("/opt/ffmpeg-3.0/ffmpeg -i \"$thefile\" -q 10 $resize \"$newvid\"");
 		system ("rm \"$thefile\"");
 	}
 }
