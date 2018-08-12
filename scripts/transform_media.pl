@@ -98,27 +98,30 @@ sub process_video {
 		system ("rm \"$thefile\"");
 	}
 
-	my $rot = `mediainfo --Inform="Video;%Rotation%" "$thefile"`;
-	chomp $rot;
-	my $width = `mediainfo --Inform="Video;%Width%" "$thefile"`;
-	my $height = `mediainfo --Inform="Video;%Height%" "$thefile"`;
-	chomp $width;
-	chomp $height;
+	#my $rot = `mediainfo --Inform="Video;%Rotation%" "$thefile"`;
+	#chomp $rot;
+	#my $width = `mediainfo --Inform="Video;%Width%" "$thefile"`;
+	#my $height = `mediainfo --Inform="Video;%Height%" "$thefile"`;
+	#chomp $width;
+	#chomp $height;
 
-	if ($rot != 0 || ($width>1920 && $height>1080)) {
-		my $newvid = $thefile;
-		$newvid =~ s/$ext$/rotated.$ext/;
-		print STDERR "Rotating $rot degrees (or resizing)...\n";
+	#if (($rot != 0 && $rot != 90) || ($width>1920 && $height>1080)) {
+		#my $newvid = $thefile;
+		#$newvid =~ s/$ext$/rotated.$ext/;
+		#print STDERR "Rotating $rot degrees (or resizing)...\n";
 
-		$resize="";
-		if ($width > 1920 && $height > 1080) {$resize = "-vf scale=1920:-1";}
+		#$resize="";
+		#if ($width > 1920 && $height > 1080) {$resize = "-vf scale=1920:-1";}
 
-		# ffmpeg 3.0 will autorotate video
-		#if ($rot == 180) {system ("avconv -i \"$thefile\" -vf \"transpose=1,transpose=1\" \"$newvid\"");}
-		#elsif ($rot == 90) {system ("avconv -i \"$thefile\" -vf \"transpose=1\" \"$newvid\"");}
-		system ("/opt/ffmpeg-3.0/ffmpeg -i \"$thefile\" -q 10 $resize \"$newvid\"");
-		system ("rm \"$thefile\"");
-	}
+		## ffmpeg 3.0 will autorotate video
+		##if ($rot == 180) {system ("avconv -i \"$thefile\" -vf \"transpose=1,transpose=1\" \"$newvid\"");}
+		##elsif ($rot == 90) {system ("avconv -i \"$thefile\" -vf \"transpose=1\" \"$newvid\"");}
+#
+		##if ($rot == 90) {system ("avconv -strict -2 -i \"$thefile\" -vf \"transpose=1\" \"$newvid\"");}
+		##else {system ("/opt/ffmpeg-3.0/ffmpeg -i \"$thefile\" -q 10 $resize \"$newvid\"");}
+		#system ("/opt/ffmpeg-3.0/ffmpeg -i \"$thefile\" -q 10 $resize \"$newvid\"");
+		#system ("rm \"$thefile\"");
+	#}
 }
 
 sub process_file {

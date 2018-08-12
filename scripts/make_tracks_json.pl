@@ -210,7 +210,7 @@ sub process_file {
 	print STDERR "Processing: $thefile...\n";
 
 	if ($thefile =~ /^.+\.(jpe{0,1}g)$/i || $thefile =~ /^.+\.(png)$/i) {process_image ($thefile, $isincurrdir, $1);}
-	elsif ($thefile =~ /^.+\.(mpe{0,1}g)$/i || $thefile =~ /^.+\.(avi)$/i || $thefile =~ /^.+\.(mp4)$/i || $thefile =~ /^.+\.(mov)$/i) {process_video ($thefile, $isincurrdir, $1);}
+	elsif ($thefile =~ /^.+\.(mpe{0,1}g)$/i || $thefile =~ /^.+\.(avi)$/i || $thefile =~ /^.+\.(mp4)$/i || $thefile =~ /^.+\.(mov)$/i || $thefile =~ /^.+\.(m4v)$/i) {process_video ($thefile, $isincurrdir, $1);}
 	else {print STDERR "****Error: Unknown file type for file: $thefile\n";}
 }
 
